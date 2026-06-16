@@ -3,13 +3,34 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: FISCALIZA.GOV API - Plataforma de Gestão e Fiscalização de Obras Públicas
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Autenticação e perfil de usuário
+  - name: obras
+    description: Gestão de obras públicas
+  - name: visitas
+    description: Visitas de fiscalização
+  - name: medicoes
+    description: Boletins de medição
+  - name: nao-conformidades
+    description: Não conformidades detectadas
+  - name: documentos
+    description: Documentos da obra
+  - name: notificacoes
+    description: Notificações formais
+  - name: ia
+    description: Inteligência artificial - análise de obras
+  - name: dashboard
+    description: KPIs e dados de resumo
+  - name: portal
+    description: Portal público de transparência
+
 paths:
   /healthz:
     get:
@@ -24,6 +45,689 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # AUTH
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login com email e senha
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login bem-sucedido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Credenciais inválidas
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Retorna o usuário autenticado
+      responses:
+        "200":
+          description: Usuário autenticado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logout realizado
+
+  # OBRAS
+  /obras:
+    get:
+      operationId: listObras
+      tags: [obras]
+      summary: Lista obras do município
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: tipo
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de obras
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Obra"
+    post:
+      operationId: createObra
+      tags: [obras]
+      summary: Cadastra nova obra
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ObraInput"
+      responses:
+        "201":
+          description: Obra criada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Obra"
+
+  /obras/{id}:
+    get:
+      operationId: getObra
+      tags: [obras]
+      summary: Detalhe de uma obra
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Obra encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Obra"
+    patch:
+      operationId: updateObra
+      tags: [obras]
+      summary: Atualiza uma obra
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ObraUpdate"
+      responses:
+        "200":
+          description: Obra atualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Obra"
+    delete:
+      operationId: deleteObra
+      tags: [obras]
+      summary: Remove uma obra
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Obra removida
+
+  /obras/{id}/timeline:
+    get:
+      operationId: getObraTimeline
+      tags: [obras]
+      summary: Linha do tempo da obra
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Eventos da obra em ordem cronológica
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimelineEvent"
+
+  /obras/{id}/curva-s:
+    get:
+      operationId: getObraCurvaS
+      tags: [obras]
+      summary: Dados da Curva S (planejado vs realizado)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dados mensais para o gráfico
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CurvaSPoint"
+
+  /obras/{id}/aditivos:
+    get:
+      operationId: listAditivos
+      tags: [obras]
+      summary: Lista aditivos contratuais de uma obra
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lista de aditivos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Aditivo"
+    post:
+      operationId: createAditivo
+      tags: [obras]
+      summary: Registra aditivo contratual
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AditivoInput"
+      responses:
+        "201":
+          description: Aditivo registrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Aditivo"
+
+  # VISITAS
+  /visitas:
+    get:
+      operationId: listVisitas
+      tags: [visitas]
+      summary: Lista visitas de fiscalização
+      parameters:
+        - name: obraId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lista de visitas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Visita"
+    post:
+      operationId: createVisita
+      tags: [visitas]
+      summary: Registra nova visita de fiscalização
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VisitaInput"
+      responses:
+        "201":
+          description: Visita registrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Visita"
+
+  /visitas/{id}:
+    get:
+      operationId: getVisita
+      tags: [visitas]
+      summary: Detalhe de uma visita
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Visita encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Visita"
+
+  # NAO CONFORMIDADES
+  /nao-conformidades:
+    get:
+      operationId: listNaoConformidades
+      tags: [nao-conformidades]
+      summary: Lista não conformidades
+      parameters:
+        - name: obraId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: severidade
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de não conformidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NaoConformidade"
+    post:
+      operationId: createNaoConformidade
+      tags: [nao-conformidades]
+      summary: Registra não conformidade
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NaoConformidadeInput"
+      responses:
+        "201":
+          description: Não conformidade registrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NaoConformidade"
+
+  /nao-conformidades/{id}/resolver:
+    patch:
+      operationId: resolverNaoConformidade
+      tags: [nao-conformidades]
+      summary: Marca não conformidade como resolvida
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResolucaoInput"
+      responses:
+        "200":
+          description: Não conformidade resolvida
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NaoConformidade"
+
+  # MEDIÇÕES
+  /medicoes:
+    get:
+      operationId: listMedicoes
+      tags: [medicoes]
+      summary: Lista boletins de medição
+      parameters:
+        - name: obraId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de medições
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Medicao"
+    post:
+      operationId: createMedicao
+      tags: [medicoes]
+      summary: Gera boletim de medição
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MedicaoInput"
+      responses:
+        "201":
+          description: Medição criada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Medicao"
+
+  /medicoes/{id}/aprovar:
+    patch:
+      operationId: aprovarMedicao
+      tags: [medicoes]
+      summary: Aprova boletim de medição
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Medição aprovada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Medicao"
+
+  # DOCUMENTOS
+  /documentos:
+    get:
+      operationId: listDocumentos
+      tags: [documentos]
+      summary: Lista documentos de uma obra
+      parameters:
+        - name: obraId
+          in: query
+          schema:
+            type: integer
+        - name: categoria
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de documentos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Documento"
+    post:
+      operationId: createDocumento
+      tags: [documentos]
+      summary: Registra documento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentoInput"
+      responses:
+        "201":
+          description: Documento registrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Documento"
+
+  # NOTIFICAÇÕES
+  /notificacoes:
+    get:
+      operationId: listNotificacoes
+      tags: [notificacoes]
+      summary: Lista notificações formais
+      parameters:
+        - name: obraId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de notificações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notificacao"
+    post:
+      operationId: createNotificacao
+      tags: [notificacoes]
+      summary: Envia notificação formal à construtora
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificacaoInput"
+      responses:
+        "201":
+          description: Notificação enviada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notificacao"
+
+  # IA
+  /ia/analise/{obraId}:
+    get:
+      operationId: getAnaliseIA
+      tags: [ia]
+      summary: Busca análise de risco mais recente da obra
+      parameters:
+        - name: obraId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Análise de risco
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnaliseIA"
+
+  /ia/relatorio/{obraId}:
+    post:
+      operationId: gerarRelatorioIA
+      tags: [ia]
+      summary: Gera relatório executivo da obra via IA
+      parameters:
+        - name: obraId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Relatório gerado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelatorioIA"
+
+  /ia/chat:
+    post:
+      operationId: chatAssistente
+      tags: [ia]
+      summary: Assistente do gestor via chat contextual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatInput"
+      responses:
+        "200":
+          description: Resposta do assistente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+
+  # DASHBOARD
+  /dashboard/kpis:
+    get:
+      operationId: getDashboardKpis
+      tags: [dashboard]
+      summary: KPIs gerais do município
+      responses:
+        "200":
+          description: KPIs do dashboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardKpis"
+
+  /dashboard/obras-por-status:
+    get:
+      operationId: getObrasPorStatus
+      tags: [dashboard]
+      summary: Contagem de obras agrupadas por status
+      responses:
+        "200":
+          description: Obras por status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StatusCount"
+
+  /dashboard/atividade-recente:
+    get:
+      operationId: getAtividadeRecente
+      tags: [dashboard]
+      summary: Feed de atividade recente do município
+      responses:
+        "200":
+          description: Atividades recentes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AtividadeItem"
+
+  /dashboard/obras-em-risco:
+    get:
+      operationId: getObrasEmRisco
+      tags: [dashboard]
+      summary: Obras com risco detectado pela IA
+      responses:
+        "200":
+          description: Obras em risco
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ObraRisco"
+
+  # PORTAL PÚBLICO
+  /portal/obras:
+    get:
+      operationId: listObrasPublicas
+      tags: [portal]
+      summary: Lista obras para o portal público
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: tipo
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Obras públicas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ObraPublica"
+
+  /portal/totalizadores:
+    get:
+      operationId: getTotalizadores
+      tags: [portal]
+      summary: Totalizadores do município para o portal público
+      responses:
+        "200":
+          description: Totalizadores
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Totalizadores"
+
+  /portal/obras/{id}:
+    get:
+      operationId: getObraPublica
+      tags: [portal]
+      summary: Detalhe público de uma obra
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detalhes da obra
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObraPublica"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +738,697 @@ components:
       required:
         - status
 
+    # AUTH
+    LoginInput:
+      type: object
+      required: [email, senha]
+      properties:
+        email:
+          type: string
+          format: email
+        senha:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [token, usuario]
+      properties:
+        token:
+          type: string
+        usuario:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      required: [id, nome, email, perfil, municipioId]
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        email:
+          type: string
+        perfil:
+          type: string
+          enum: [administrador, gestor, fiscal, engenheiro, auditor, cidadao]
+        municipioId:
+          type: integer
+        municipioNome:
+          type: ["string", "null"]
+        avatar:
+          type: ["string", "null"]
+        criadoEm:
+          type: string
+          format: date-time
+
+    # OBRAS
+    Obra:
+      type: object
+      required: [id, nome, tipo, status, valorContratado, dataInicio, dataFimPrevista, empresaContratada, municipioId]
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        descricao:
+          type: ["string", "null"]
+        tipo:
+          type: string
+          enum: [pavimentacao, edificacao, saneamento, iluminacao, pontes, outros]
+        status:
+          type: string
+          enum: [contratada, em_execucao, paralisada, concluida, rescindida]
+        valorContratado:
+          type: number
+        valorAtual:
+          type: number
+        dataInicio:
+          type: string
+          format: date
+        dataFimPrevista:
+          type: string
+          format: date
+        dataFimAtual:
+          type: ["string", "null"]
+          format: date
+        empresaContratada:
+          type: string
+        cnpjEmpresa:
+          type: ["string", "null"]
+        numeroContrato:
+          type: ["string", "null"]
+        fonteRecursos:
+          type: ["string", "null"]
+        logradouro:
+          type: ["string", "null"]
+        bairro:
+          type: ["string", "null"]
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        percentualFisicoAtual:
+          type: number
+        municipioId:
+          type: integer
+        responsavelTecnico:
+          type: ["string", "null"]
+        criadoEm:
+          type: string
+          format: date-time
+        atualizadoEm:
+          type: string
+          format: date-time
+        totalVisitas:
+          type: ["integer", "null"]
+        totalNaoConformidades:
+          type: ["integer", "null"]
+        nivelRisco:
+          type: ["string", "null"]
+
+    ObraInput:
+      type: object
+      required: [nome, tipo, valorContratado, dataInicio, dataFimPrevista, empresaContratada]
+      properties:
+        nome:
+          type: string
+        descricao:
+          type: string
+        tipo:
+          type: string
+          enum: [pavimentacao, edificacao, saneamento, iluminacao, pontes, outros]
+        status:
+          type: string
+          enum: [contratada, em_execucao, paralisada, concluida, rescindida]
+        valorContratado:
+          type: number
+        dataInicio:
+          type: string
+          format: date
+        dataFimPrevista:
+          type: string
+          format: date
+        empresaContratada:
+          type: string
+        cnpjEmpresa:
+          type: string
+        numeroContrato:
+          type: string
+        fonteRecursos:
+          type: string
+        logradouro:
+          type: string
+        bairro:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        responsavelTecnico:
+          type: string
+
+    ObraUpdate:
+      type: object
+      properties:
+        nome:
+          type: string
+        descricao:
+          type: string
+        status:
+          type: string
+          enum: [contratada, em_execucao, paralisada, concluida, rescindida]
+        percentualFisicoAtual:
+          type: number
+        dataFimAtual:
+          type: string
+          format: date
+        responsavelTecnico:
+          type: string
+
+    Aditivo:
+      type: object
+      required: [id, obraId, tipo, justificativa, numeroAditivo, dataAssinatura]
+      properties:
+        id:
+          type: integer
+        obraId:
+          type: integer
+        tipo:
+          type: string
+          enum: [prazo, valor, prazo_e_valor]
+        numeroAditivo:
+          type: integer
+        justificativa:
+          type: string
+        dataAssinatura:
+          type: string
+          format: date
+        valorAcrescimo:
+          type: ["number", "null"]
+        diasAcrescimo:
+          type: ["integer", "null"]
+        percentualAcrescimo:
+          type: ["number", "null"]
+        criadoEm:
+          type: string
+          format: date-time
+
+    AditivoInput:
+      type: object
+      required: [tipo, justificativa, numeroAditivo, dataAssinatura]
+      properties:
+        tipo:
+          type: string
+          enum: [prazo, valor, prazo_e_valor]
+        numeroAditivo:
+          type: integer
+        justificativa:
+          type: string
+        dataAssinatura:
+          type: string
+          format: date
+        valorAcrescimo:
+          type: number
+        diasAcrescimo:
+          type: integer
+
+    TimelineEvent:
+      type: object
+      required: [id, tipo, descricao, data]
+      properties:
+        id:
+          type: string
+        tipo:
+          type: string
+          enum: [visita, medicao, aditivo, documento, notificacao, status_change, nao_conformidade]
+        descricao:
+          type: string
+        data:
+          type: string
+          format: date-time
+        autor:
+          type: ["string", "null"]
+        metadata:
+          type: object
+
+    CurvaSPoint:
+      type: object
+      required: [mes, planejado, realizado]
+      properties:
+        mes:
+          type: string
+        planejado:
+          type: number
+        realizado:
+          type: number
+        valorPlanejado:
+          type: number
+        valorRealizado:
+          type: number
+
+    # VISITAS
+    Visita:
+      type: object
+      required: [id, obraId, fiscalId, visitadoEm, percentualFisico]
+      properties:
+        id:
+          type: integer
+        obraId:
+          type: integer
+        obraNome:
+          type: ["string", "null"]
+        fiscalId:
+          type: integer
+        fiscalNome:
+          type: ["string", "null"]
+        visitadoEm:
+          type: string
+          format: date-time
+        percentualFisico:
+          type: number
+        totalTrabalhadores:
+          type: ["integer", "null"]
+        atividadesExecutadas:
+          type: ["string", "null"]
+        observacoes:
+          type: ["string", "null"]
+        condicoesClimaticas:
+          type: ["string", "null"]
+        gpsLat:
+          type: ["number", "null"]
+        gpsLng:
+          type: ["number", "null"]
+        foiCriadoOffline:
+          type: boolean
+        totalFotos:
+          type: ["integer", "null"]
+        totalNaoConformidades:
+          type: ["integer", "null"]
+        criadoEm:
+          type: string
+          format: date-time
+
+    VisitaInput:
+      type: object
+      required: [obraId, percentualFisico]
+      properties:
+        obraId:
+          type: integer
+        percentualFisico:
+          type: number
+        totalTrabalhadores:
+          type: integer
+        atividadesExecutadas:
+          type: string
+        observacoes:
+          type: string
+        condicoesClimaticas:
+          type: string
+        gpsLat:
+          type: number
+        gpsLng:
+          type: number
+
+    # NAO CONFORMIDADES
+    NaoConformidade:
+      type: object
+      required: [id, visitaId, obraId, severidade, descricao, status]
+      properties:
+        id:
+          type: integer
+        visitaId:
+          type: integer
+        obraId:
+          type: integer
+        obraNome:
+          type: ["string", "null"]
+        severidade:
+          type: string
+          enum: [leve, moderada, grave, critica]
+        descricao:
+          type: string
+        prazoCorrecaoDias:
+          type: ["integer", "null"]
+        status:
+          type: string
+          enum: [pendente, em_correcao, resolvida, vencida]
+        resolvidaEm:
+          type: ["string", "null"]
+          format: date-time
+        resolucaoDescricao:
+          type: ["string", "null"]
+        criadoEm:
+          type: string
+          format: date-time
+
+    NaoConformidadeInput:
+      type: object
+      required: [visitaId, obraId, severidade, descricao]
+      properties:
+        visitaId:
+          type: integer
+        obraId:
+          type: integer
+        severidade:
+          type: string
+          enum: [leve, moderada, grave, critica]
+        descricao:
+          type: string
+        prazoCorrecaoDias:
+          type: integer
+
+    ResolucaoInput:
+      type: object
+      required: [resolucaoDescricao]
+      properties:
+        resolucaoDescricao:
+          type: string
+
+    # MEDIÇÕES
+    Medicao:
+      type: object
+      required: [id, obraId, periodoInicio, periodoFim, valorTotal, status]
+      properties:
+        id:
+          type: integer
+        obraId:
+          type: integer
+        obraNome:
+          type: ["string", "null"]
+        periodoInicio:
+          type: string
+          format: date
+        periodoFim:
+          type: string
+          format: date
+        valorTotal:
+          type: number
+        valorAcumulado:
+          type: number
+        status:
+          type: string
+          enum: [rascunho, aguardando_engenheiro, aguardando_gestor, aprovada, paga]
+        aprovadoPor:
+          type: ["integer", "null"]
+        aprovadoEm:
+          type: ["string", "null"]
+          format: date-time
+        observacoes:
+          type: ["string", "null"]
+        criadoEm:
+          type: string
+          format: date-time
+
+    MedicaoInput:
+      type: object
+      required: [obraId, periodoInicio, periodoFim, valorTotal]
+      properties:
+        obraId:
+          type: integer
+        periodoInicio:
+          type: string
+          format: date
+        periodoFim:
+          type: string
+          format: date
+        valorTotal:
+          type: number
+        observacoes:
+          type: string
+
+    # DOCUMENTOS
+    Documento:
+      type: object
+      required: [id, obraId, categoria, nome, fileUrl]
+      properties:
+        id:
+          type: integer
+        obraId:
+          type: integer
+        categoria:
+          type: string
+          enum: [contrato, aditivo, projeto, laudo, art_rrt, alvara, licenca_ambiental, nota_fiscal, outros]
+        nome:
+          type: string
+        fileUrl:
+          type: string
+        versao:
+          type: integer
+        assinado:
+          type: boolean
+        expiracaoEm:
+          type: ["string", "null"]
+          format: date
+        criadoEm:
+          type: string
+          format: date-time
+
+    DocumentoInput:
+      type: object
+      required: [obraId, categoria, nome, fileUrl]
+      properties:
+        obraId:
+          type: integer
+        categoria:
+          type: string
+          enum: [contrato, aditivo, projeto, laudo, art_rrt, alvara, licenca_ambiental, nota_fiscal, outros]
+        nome:
+          type: string
+        fileUrl:
+          type: string
+        expiracaoEm:
+          type: string
+          format: date
+
+    # NOTIFICAÇÕES
+    Notificacao:
+      type: object
+      required: [id, obraId, tipo, status, enviadoEm]
+      properties:
+        id:
+          type: integer
+        obraId:
+          type: integer
+        obraNome:
+          type: ["string", "null"]
+        tipo:
+          type: string
+          enum: [nao_conformidade, paralisacao, solicitacao_documentacao, advertencia, multa]
+        status:
+          type: string
+          enum: [pendente, respondida, vencida]
+        enviadoEm:
+          type: string
+          format: date-time
+        prazoResposta:
+          type: ["string", "null"]
+          format: date
+        textoResposta:
+          type: ["string", "null"]
+        descricao:
+          type: string
+        numeroSequencial:
+          type: integer
+
+    NotificacaoInput:
+      type: object
+      required: [obraId, tipo, descricao]
+      properties:
+        obraId:
+          type: integer
+        tipo:
+          type: string
+          enum: [nao_conformidade, paralisacao, solicitacao_documentacao, advertencia, multa]
+        descricao:
+          type: string
+        prazoRespostaDias:
+          type: integer
+
+    # IA
+    AnaliseIA:
+      type: object
+      required: [id, obraId, nivelRisco, analiseTexto, criadoEm]
+      properties:
+        id:
+          type: integer
+        obraId:
+          type: integer
+        eventoGatilho:
+          type: ["string", "null"]
+        nivelRisco:
+          type: string
+          enum: [baixo, medio, alto, critico]
+        analiseTexto:
+          type: string
+        acoesRecomendadas:
+          type: ["string", "null"]
+        criadoEm:
+          type: string
+          format: date-time
+
+    RelatorioIA:
+      type: object
+      required: [obraId, relatorioTexto, geradoEm]
+      properties:
+        obraId:
+          type: integer
+        relatorioTexto:
+          type: string
+        geradoEm:
+          type: string
+          format: date-time
+
+    ChatInput:
+      type: object
+      required: [mensagem]
+      properties:
+        mensagem:
+          type: string
+        historico:
+          type: array
+          items:
+            type: object
+
+    ChatResponse:
+      type: object
+      required: [resposta]
+      properties:
+        resposta:
+          type: string
+
+    # DASHBOARD
+    DashboardKpis:
+      type: object
+      required: [totalObras, obrasEmExecucao, obrasAtrasadas, valorTotalEmExecucao, medicoesPendentes, naoConformidadesAbertas, obrasEmRisco]
+      properties:
+        totalObras:
+          type: integer
+        obrasEmExecucao:
+          type: integer
+        obrasAtrasadas:
+          type: integer
+        obrasConcluidas:
+          type: integer
+        obrasParalisadas:
+          type: integer
+        valorTotalEmExecucao:
+          type: number
+        medicoesPendentes:
+          type: integer
+        naoConformidadesAbertas:
+          type: integer
+        obrasEmRisco:
+          type: integer
+        visitasEsseMes:
+          type: integer
+
+    StatusCount:
+      type: object
+      required: [status, count]
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+        label:
+          type: string
+        valor:
+          type: number
+
+    AtividadeItem:
+      type: object
+      required: [id, tipo, descricao, data]
+      properties:
+        id:
+          type: string
+        tipo:
+          type: string
+        descricao:
+          type: string
+        data:
+          type: string
+          format: date-time
+        obraId:
+          type: ["integer", "null"]
+        obraNome:
+          type: ["string", "null"]
+        autor:
+          type: ["string", "null"]
+
+    ObraRisco:
+      type: object
+      required: [id, nome, nivelRisco, motivoRisco]
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        nivelRisco:
+          type: string
+          enum: [baixo, medio, alto, critico]
+        motivoRisco:
+          type: string
+        percentualAtraso:
+          type: ["number", "null"]
+        totalNaoConformidades:
+          type: ["integer", "null"]
+
+    # PORTAL PÚBLICO
+    ObraPublica:
+      type: object
+      required: [id, nome, tipo, status, valorContratado, empresaContratada, dataInicio, dataFimPrevista, percentualFisicoAtual]
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        descricao:
+          type: ["string", "null"]
+        tipo:
+          type: string
+        status:
+          type: string
+        valorContratado:
+          type: number
+        valorAtual:
+          type: number
+        empresaContratada:
+          type: string
+        dataInicio:
+          type: string
+          format: date
+        dataFimPrevista:
+          type: string
+          format: date
+        percentualFisicoAtual:
+          type: number
+        logradouro:
+          type: ["string", "null"]
+        bairro:
+          type: ["string", "null"]
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        fotos:
+          type: array
+          items:
+            type: string
+        ultimaAtualizacao:
+          type: ["string", "null"]
+          format: date-time
+
+    Totalizadores:
+      type: object
+      required: [totalObras, obrasEmExecucao, valorTotalInvestido, municipio]
+      properties:
+        totalObras:
+          type: integer
+        obrasEmExecucao:
+          type: integer
+        obrasConcluidas:
+          type: integer
+        valorTotalInvestido:
+          type: number
+        municipio:
+          type: string
