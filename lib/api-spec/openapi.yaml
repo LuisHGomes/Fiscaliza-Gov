@@ -667,6 +667,173 @@ paths:
                 items:
                   $ref: "#/components/schemas/ObraRisco"
 
+  # USUÁRIOS / PERFIL
+  /usuarios/me:
+    patch:
+      operationId: updateMePerfil
+      tags: [auth]
+      summary: Atualiza o perfil do usuário autenticado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePerfilInput"
+      responses:
+        "200":
+          description: Perfil atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /usuarios/me/senha:
+    patch:
+      operationId: updateMeSenha
+      tags: [auth]
+      summary: Altera a senha do usuário autenticado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSenhaInput"
+      responses:
+        "200":
+          description: Senha alterada
+
+  /usuarios:
+    get:
+      operationId: listUsuarios
+      tags: [auth]
+      summary: Lista usuários do município (admin/gestor)
+      responses:
+        "200":
+          description: Usuários do município
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  # AUDIT LOGS
+  /audit-logs:
+    get:
+      operationId: listAuditLogs
+      tags: [auth]
+      summary: Lista o histórico de atividades
+      parameters:
+        - name: usuarioId
+          in: query
+          schema:
+            type: integer
+        - name: obraId
+          in: query
+          schema:
+            type: integer
+        - name: acao
+          in: query
+          schema:
+            type: string
+        - name: dataInicio
+          in: query
+          schema:
+            type: string
+        - name: dataFim
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Histórico de atividades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditLogItem"
+
+  # OBRAS EQUIPE / MINHAS OBRAS
+  /obras/minhas:
+    get:
+      operationId: listMinhasObras
+      tags: [obras]
+      summary: Lista obras vinculadas ao fiscal autenticado
+      responses:
+        "200":
+          description: Obras vinculadas ao fiscal
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Obra"
+
+  /obras/{id}/equipe:
+    get:
+      operationId: getObraEquipe
+      tags: [obras]
+      summary: Lista a equipe de fiscalização de uma obra
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Equipe de fiscalização
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ObraFiscalItem"
+    post:
+      operationId: addFiscalObra
+      tags: [obras]
+      summary: Adiciona fiscal à equipe de uma obra
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddFiscalInput"
+      responses:
+        "201":
+          description: Fiscal adicionado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObraFiscalItem"
+
+  /obras/{id}/equipe/{userId}:
+    delete:
+      operationId: removeFiscalObra
+      tags: [obras]
+      summary: Remove fiscal da equipe de uma obra
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Fiscal removido
+
   # PORTAL PÚBLICO
   /portal/obras:
     get:
@@ -1417,6 +1584,83 @@ components:
         ultimaAtualizacao:
           type: ["string", "null"]
           format: date-time
+
+    UpdatePerfilInput:
+      type: object
+      properties:
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+
+    UpdateSenhaInput:
+      type: object
+      required: [senhaAtual, novaSenha]
+      properties:
+        senhaAtual:
+          type: string
+        novaSenha:
+          type: string
+
+    AuditLogItem:
+      type: object
+      required: [id, municipioId, usuarioId, usuarioNome, acao, descricao, criadoEm]
+      properties:
+        id:
+          type: integer
+        municipioId:
+          type: integer
+        usuarioId:
+          type: integer
+        usuarioNome:
+          type: string
+        acao:
+          type: string
+        descricao:
+          type: string
+        obraId:
+          type: ["integer", "null"]
+        obraNome:
+          type: ["string", "null"]
+        criadoEm:
+          type: string
+          format: date-time
+
+    ObraFiscalItem:
+      type: object
+      required: [id, obraId, usuarioId, nivel, criadoEm]
+      properties:
+        id:
+          type: integer
+        obraId:
+          type: integer
+        usuarioId:
+          type: integer
+        nivel:
+          type: string
+          enum: [principal, auxiliar]
+        adicionadoPor:
+          type: ["integer", "null"]
+        criadoEm:
+          type: string
+          format: date-time
+        usuarioNome:
+          type: string
+        usuarioEmail:
+          type: string
+        usuarioPerfil:
+          type: string
+
+    AddFiscalInput:
+      type: object
+      required: [usuarioId, nivel]
+      properties:
+        usuarioId:
+          type: integer
+        nivel:
+          type: string
+          enum: [principal, auxiliar]
 
     Totalizadores:
       type: object

@@ -16,6 +16,8 @@ import Medicoes from "./pages/medicoes";
 import Documentos from "./pages/documentos";
 import Notificacoes from "./pages/notificacoes";
 import IAAssistente from "./pages/ia-assistente";
+import Perfil from "./pages/perfil";
+import MinhasObras from "./pages/minhas-obras";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { AppLayout } from "./components/layout";
 
@@ -58,6 +60,8 @@ function Router() {
         <Route path="/documentos" component={Documentos} />
         <Route path="/notificacoes" component={Notificacoes} />
         <Route path="/ia-assistente" component={IAAssistente} />
+        <Route path="/perfil" component={Perfil} />
+        <Route path="/minhas-obras" component={MinhasObras} />
         <Route component={NotFound} />
       </Switch>
     </AppLayout>

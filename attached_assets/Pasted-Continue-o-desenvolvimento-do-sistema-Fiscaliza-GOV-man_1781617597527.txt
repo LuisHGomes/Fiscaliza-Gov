@@ -1,0 +1,165 @@
+Continue o desenvolvimento do sistema Fiscaliza.GOV, mantendo toda a arquitetura, stack tecnológica, padrões visuais, banco de dados e regras de negócio já existentes.
+
+Implemente os módulos abaixo como uma expansão da versão atual do sistema.
+
+1. MÓDULO DE PERFIL DO USUÁRIO
+
+Criar uma tela completa de perfil do usuário autenticado.
+
+O sistema deve importar automaticamente as informações do usuário que realizou o login, exibindo:
+
+Nome completo;
+E-mail;
+Foto de perfil (caso disponível);
+Município vinculado;
+Cargo/função dentro do sistema;
+Tipo de acesso:
+Administrador;
+Gestor;
+Fiscal;
+Engenheiro;
+Auditor.
+
+A tela de perfil deve permitir:
+
+Visualizar dados pessoais;
+Editar informações permitidas;
+Alterar senha (quando aplicável);
+Encerrar sessão através de botão de logout;
+Visualizar data do último acesso;
+Visualizar histórico de atividades realizadas dentro da plataforma.
+2. HISTÓRICO DE ATIVIDADES DO USUÁRIO
+
+Criar um sistema de auditoria individual para cada usuário.
+
+Cada ação realizada deve gerar um registro contendo:
+
+Usuário responsável;
+Data e hora da ação;
+Tipo de ação realizada;
+Objeto afetado.
+
+Exemplos:
+
+"João Silva criou uma nova visita na Obra Escola Municipal Centro."
+
+"Maria Santos editou o relatório de fiscalização da Ponte do Rio."
+
+"Pedro Oliveira anexou 5 imagens na obra Praça Central."
+
+O histórico deve possuir filtros por:
+
+Período;
+Tipo de ação;
+Obra relacionada.
+3. RELACIONAMENTO ENTRE FISCAIS E OBRAS
+
+Implementar um sistema onde administradores possam gerenciar quais fiscais possuem acesso a cada obra.
+
+A tela de detalhes da obra deve possuir uma aba "Equipe de Fiscalização".
+
+Administradores poderão:
+
+Adicionar fiscais responsáveis pela obra;
+Remover fiscais;
+Alterar o nível de responsabilidade do fiscal;
+Definir fiscal principal e fiscais auxiliares;
+Visualizar histórico de mudanças na equipe.
+
+Regras de acesso:
+
+Um fiscal comum deve visualizar apenas as obras em que foi designado.
+Administradores e gestores podem visualizar todas as obras do município.
+Todas as alterações devem ser registradas no log de auditoria.
+4. TELA COMPLETA DE DETALHES DA OBRA
+
+Ao selecionar uma obra, o usuário deve acessar uma página detalhada contendo:
+
+Informações gerais:
+Nome da obra;
+Descrição;
+Localização;
+Empresa contratada;
+Status atual;
+Valor contratado;
+Prazo de execução;
+Percentual de conclusão.
+Abas da obra:
+Linha do tempo
+
+Mostrar todos os eventos relacionados:
+
+Criação da obra;
+Alterações cadastrais;
+Visitas realizadas;
+Registros dos fiscais;
+Anexos enviados;
+Alterações de status.
+Registros de fiscalização
+
+Os fiscais autorizados devem poder:
+
+Criar novos registros contendo:
+
+Data e horário automático;
+Descrição do que foi observado no local;
+Andamento da obra;
+Problemas encontrados;
+Recomendações;
+Fotos e documentos.
+
+Também devem poder:
+
+Editar registros criados anteriormente;
+Excluir registros incorretos;
+Visualizar todos os registros feitos por outros fiscais da mesma obra.
+5. CONTROLE DE PERMISSÕES
+
+Aplicar RBAC (Role-Based Access Control) em todas as novas funcionalidades.
+
+Exemplo:
+
+FISCAL:
+
+Pode visualizar suas obras;
+Pode criar registros;
+Pode editar seus próprios registros;
+Pode visualizar registros de outros fiscais da mesma obra.
+
+ADMINISTRADOR:
+
+Pode visualizar todas as obras;
+Pode gerenciar usuários;
+Pode atribuir ou remover fiscais;
+Pode editar ou excluir qualquer registro.
+
+AUDITOR:
+
+Acesso somente leitura aos dados e histórico.
+6. EXPERIÊNCIA DO USUÁRIO
+
+A interface deve seguir o mesmo padrão visual do sistema atual.
+
+Adicionar:
+
+Menu de usuário no canto superior direito;
+Avatar;
+Acesso rápido ao perfil;
+Botão de logout;
+Indicadores visuais de cargo do usuário;
+Tela "Minhas Obras", mostrando apenas as obras em que o fiscal está vinculado.
+7. ALTERAÇÕES NO BANCO DE DADOS
+
+Criar as entidades e relacionamentos necessários para suportar:
+
+Relação muitos-para-muitos entre usuários e obras;
+Histórico de atividades (audit logs);
+Controle de responsáveis por obra;
+Permissões por função.
+
+Criar migrations e atualizar a API, o frontend e os endpoints necessários.
+
+IMPORTANTE:
+Não recriar funcionalidades já existentes. Analise o código atual do projeto e implemente apenas os módulos ausentes, reutilizando componentes, modelos de dados, autenticação, APIs e padrões já criados.
+
+O código deve seguir a mesma arquitetura do projeto, mantendo segurança, escalabilidade, responsividade e boas práticas de desenvolvimento.

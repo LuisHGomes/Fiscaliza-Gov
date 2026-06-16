@@ -654,6 +654,153 @@ export const GetObrasEmRiscoResponse = zod.array(GetObrasEmRiscoResponseItem)
 
 
 /**
+ * @summary Atualiza o perfil do usuário autenticado
+ */
+export const UpdateMePerfilBody = zod.object({
+  "nome": zod.string().optional(),
+  "email": zod.string().email().optional()
+})
+
+export const UpdateMePerfilResponse = zod.object({
+  "id": zod.number(),
+  "nome": zod.string(),
+  "email": zod.string(),
+  "perfil": zod.enum(['administrador', 'gestor', 'fiscal', 'engenheiro', 'auditor', 'cidadao']),
+  "municipioId": zod.number(),
+  "municipioNome": zod.string().nullish(),
+  "avatar": zod.string().nullish(),
+  "criadoEm": zod.coerce.date().optional()
+})
+
+
+/**
+ * @summary Altera a senha do usuário autenticado
+ */
+export const UpdateMeSenhaBody = zod.object({
+  "senhaAtual": zod.string(),
+  "novaSenha": zod.string()
+})
+
+
+/**
+ * @summary Lista usuários do município (admin/gestor)
+ */
+export const ListUsuariosResponseItem = zod.object({
+  "id": zod.number(),
+  "nome": zod.string(),
+  "email": zod.string(),
+  "perfil": zod.enum(['administrador', 'gestor', 'fiscal', 'engenheiro', 'auditor', 'cidadao']),
+  "municipioId": zod.number(),
+  "municipioNome": zod.string().nullish(),
+  "avatar": zod.string().nullish(),
+  "criadoEm": zod.coerce.date().optional()
+})
+export const ListUsuariosResponse = zod.array(ListUsuariosResponseItem)
+
+
+/**
+ * @summary Lista o histórico de atividades
+ */
+export const ListAuditLogsQueryParams = zod.object({
+  "usuarioId": zod.coerce.number().optional(),
+  "obraId": zod.coerce.number().optional(),
+  "acao": zod.coerce.string().optional(),
+  "dataInicio": zod.coerce.string().optional(),
+  "dataFim": zod.coerce.string().optional()
+})
+
+export const ListAuditLogsResponseItem = zod.object({
+  "id": zod.number(),
+  "municipioId": zod.number(),
+  "usuarioId": zod.number(),
+  "usuarioNome": zod.string(),
+  "acao": zod.string(),
+  "descricao": zod.string(),
+  "obraId": zod.number().nullish(),
+  "obraNome": zod.string().nullish(),
+  "criadoEm": zod.coerce.date()
+})
+export const ListAuditLogsResponse = zod.array(ListAuditLogsResponseItem)
+
+
+/**
+ * @summary Lista obras vinculadas ao fiscal autenticado
+ */
+export const ListMinhasObrasResponseItem = zod.object({
+  "id": zod.number(),
+  "nome": zod.string(),
+  "descricao": zod.string().nullish(),
+  "tipo": zod.enum(['pavimentacao', 'edificacao', 'saneamento', 'iluminacao', 'pontes', 'outros']),
+  "status": zod.enum(['contratada', 'em_execucao', 'paralisada', 'concluida', 'rescindida']),
+  "valorContratado": zod.number(),
+  "valorAtual": zod.number().optional(),
+  "dataInicio": zod.coerce.date(),
+  "dataFimPrevista": zod.coerce.date(),
+  "dataFimAtual": zod.coerce.date().nullish(),
+  "empresaContratada": zod.string(),
+  "cnpjEmpresa": zod.string().nullish(),
+  "numeroContrato": zod.string().nullish(),
+  "fonteRecursos": zod.string().nullish(),
+  "logradouro": zod.string().nullish(),
+  "bairro": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "percentualFisicoAtual": zod.number().optional(),
+  "municipioId": zod.number(),
+  "responsavelTecnico": zod.string().nullish(),
+  "criadoEm": zod.coerce.date().optional(),
+  "atualizadoEm": zod.coerce.date().optional(),
+  "totalVisitas": zod.number().nullish(),
+  "totalNaoConformidades": zod.number().nullish(),
+  "nivelRisco": zod.string().nullish()
+})
+export const ListMinhasObrasResponse = zod.array(ListMinhasObrasResponseItem)
+
+
+/**
+ * @summary Lista a equipe de fiscalização de uma obra
+ */
+export const GetObraEquipeParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetObraEquipeResponseItem = zod.object({
+  "id": zod.number(),
+  "obraId": zod.number(),
+  "usuarioId": zod.number(),
+  "nivel": zod.enum(['principal', 'auxiliar']),
+  "adicionadoPor": zod.number().nullish(),
+  "criadoEm": zod.coerce.date(),
+  "usuarioNome": zod.string().optional(),
+  "usuarioEmail": zod.string().optional(),
+  "usuarioPerfil": zod.string().optional()
+})
+export const GetObraEquipeResponse = zod.array(GetObraEquipeResponseItem)
+
+
+/**
+ * @summary Adiciona fiscal à equipe de uma obra
+ */
+export const AddFiscalObraParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AddFiscalObraBody = zod.object({
+  "usuarioId": zod.number(),
+  "nivel": zod.enum(['principal', 'auxiliar'])
+})
+
+
+/**
+ * @summary Remove fiscal da equipe de uma obra
+ */
+export const RemoveFiscalObraParams = zod.object({
+  "id": zod.coerce.number(),
+  "userId": zod.coerce.number()
+})
+
+
+/**
  * @summary Lista obras para o portal público
  */
 export const ListObrasPublicasQueryParams = zod.object({

@@ -610,6 +610,64 @@ export interface ObraPublica {
   ultimaAtualizacao?: string | null;
 }
 
+export interface UpdatePerfilInput {
+  nome?: string;
+  email?: string;
+}
+
+export interface UpdateSenhaInput {
+  senhaAtual: string;
+  novaSenha: string;
+}
+
+export interface AuditLogItem {
+  id: number;
+  municipioId: number;
+  usuarioId: number;
+  usuarioNome: string;
+  acao: string;
+  descricao: string;
+  /** @nullable */
+  obraId?: number | null;
+  /** @nullable */
+  obraNome?: string | null;
+  criadoEm: string;
+}
+
+export type ObraFiscalItemNivel = typeof ObraFiscalItemNivel[keyof typeof ObraFiscalItemNivel];
+
+
+export const ObraFiscalItemNivel = {
+  principal: 'principal',
+  auxiliar: 'auxiliar',
+} as const;
+
+export interface ObraFiscalItem {
+  id: number;
+  obraId: number;
+  usuarioId: number;
+  nivel: ObraFiscalItemNivel;
+  /** @nullable */
+  adicionadoPor?: number | null;
+  criadoEm: string;
+  usuarioNome?: string;
+  usuarioEmail?: string;
+  usuarioPerfil?: string;
+}
+
+export type AddFiscalInputNivel = typeof AddFiscalInputNivel[keyof typeof AddFiscalInputNivel];
+
+
+export const AddFiscalInputNivel = {
+  principal: 'principal',
+  auxiliar: 'auxiliar',
+} as const;
+
+export interface AddFiscalInput {
+  usuarioId: number;
+  nivel: AddFiscalInputNivel;
+}
+
 export interface Totalizadores {
   totalObras: number;
   obrasEmExecucao: number;
@@ -647,6 +705,14 @@ categoria?: string;
 export type ListNotificacoesParams = {
 obraId?: number;
 status?: string;
+};
+
+export type ListAuditLogsParams = {
+usuarioId?: number;
+obraId?: number;
+acao?: string;
+dataInicio?: string;
+dataFim?: string;
 };
 
 export type ListObrasPublicasParams = {

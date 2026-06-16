@@ -2,15 +2,17 @@ import { Router, Request, Response } from "express";
 import { db } from "@workspace/db";
 import {
   obrasTable, visitasTable, naoConformidadesTable, aditivosTable, analisesIATable,
-  medicoesTable, notificacoesTable, documentosTable, fotosVisitaTable
+  medicoesTable, notificacoesTable, documentosTable, fotosVisitaTable,
+  obraFiscaisTable, usuariosTable
 } from "@workspace/db";
-import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import { eq, and, ilike, sql, desc, count, inArray } from "drizzle-orm";
 import { requireAuth, AuthPayload } from "../middlewares/auth";
 import {
   CreateObraBody, UpdateObraBody, UpdateObraParams, GetObraParams,
   DeleteObraParams, GetObraTimelineParams, GetObraCurvaSParams,
   ListAditivosParams, CreateAditivoBody, CreateAditivoParams
 } from "@workspace/api-zod";
+import { logAudit } from "../lib/audit";
 
 const router = Router();
 router.use(requireAuth);
@@ -135,6 +137,63 @@ router.post("/", async (req: AuthRequest, res: Response) => {
     totalNaoConformidades: 0,
     nivelRisco: null,
   });
+});
+
+// "Minhas Obras" — must be declared before /:id to avoid conflict
+router.get("/minhas", async (req: AuthRequest, res: Response) => {
+  const { auth } = req;
+
+  // Admins and gestores see all obras
+  if (auth.perfil === "administrador" || auth.perfil === "gestor") {
+    const obras = await db
+      .select()
+      .from(obrasTable)
+      .where(eq(obrasTable.municipioId, auth.municipioId))
+      .orderBy(desc(obrasTable.criadoEm));
+
+    res.json(obras.map((o) => ({
+      ...o,
+      valorContratado: Number(o.valorContratado),
+      valorAtual: o.valorAtual ? Number(o.valorAtual) : Number(o.valorContratado),
+      percentualFisicoAtual: Number(o.percentualFisicoAtual ?? 0),
+      latitude: o.latitude ? Number(o.latitude) : null,
+      longitude: o.longitude ? Number(o.longitude) : null,
+      criadoEm: o.criadoEm.toISOString(),
+      atualizadoEm: o.atualizadoEm.toISOString(),
+    })));
+    return;
+  }
+
+  const assignments = await db
+    .select({ obraId: obraFiscaisTable.obraId })
+    .from(obraFiscaisTable)
+    .where(eq(obraFiscaisTable.usuarioId, auth.userId));
+
+  if (assignments.length === 0) {
+    res.json([]);
+    return;
+  }
+
+  const obraIds = assignments.map((a) => a.obraId);
+  const obras = await db
+    .select()
+    .from(obrasTable)
+    .where(and(
+      eq(obrasTable.municipioId, auth.municipioId),
+      inArray(obrasTable.id, obraIds)
+    ))
+    .orderBy(desc(obrasTable.criadoEm));
+
+  res.json(obras.map((o) => ({
+    ...o,
+    valorContratado: Number(o.valorContratado),
+    valorAtual: o.valorAtual ? Number(o.valorAtual) : Number(o.valorContratado),
+    percentualFisicoAtual: Number(o.percentualFisicoAtual ?? 0),
+    latitude: o.latitude ? Number(o.latitude) : null,
+    longitude: o.longitude ? Number(o.longitude) : null,
+    criadoEm: o.criadoEm.toISOString(),
+    atualizadoEm: o.atualizadoEm.toISOString(),
+  })));
 });
 
 router.get("/:id", async (req: AuthRequest, res: Response) => {
@@ -319,6 +378,107 @@ router.post("/:id/aditivos", async (req: AuthRequest, res: Response) => {
     percentualAcrescimo: aditivo.percentualAcrescimo ? Number(aditivo.percentualAcrescimo) : null,
     criadoEm: aditivo.criadoEm.toISOString(),
   });
+});
+
+// EQUIPE DE FISCALIZAÇÃO
+router.get("/:id/equipe", async (req: AuthRequest, res: Response) => {
+  const obraId = Number(req.params.id);
+  if (isNaN(obraId)) { res.status(400).json({ error: "ID inválido" }); return; }
+
+  const equipe = await db
+    .select({
+      id: obraFiscaisTable.id,
+      obraId: obraFiscaisTable.obraId,
+      usuarioId: obraFiscaisTable.usuarioId,
+      nivel: obraFiscaisTable.nivel,
+      adicionadoPor: obraFiscaisTable.adicionadoPor,
+      criadoEm: obraFiscaisTable.criadoEm,
+      usuarioNome: usuariosTable.nome,
+      usuarioEmail: usuariosTable.email,
+      usuarioPerfil: usuariosTable.perfil,
+    })
+    .from(obraFiscaisTable)
+    .innerJoin(usuariosTable, eq(usuariosTable.id, obraFiscaisTable.usuarioId))
+    .where(eq(obraFiscaisTable.obraId, obraId));
+
+  res.json(equipe.map((e) => ({ ...e, criadoEm: e.criadoEm.toISOString() })));
+});
+
+router.post("/:id/equipe", async (req: AuthRequest, res: Response) => {
+  const { auth } = req;
+  if (auth.perfil !== "administrador" && auth.perfil !== "gestor") {
+    res.status(403).json({ error: "Apenas administradores e gestores podem gerenciar equipes" });
+    return;
+  }
+
+  const obraId = Number(req.params.id);
+  if (isNaN(obraId)) { res.status(400).json({ error: "ID inválido" }); return; }
+
+  const { usuarioId, nivel } = req.body as { usuarioId: number; nivel: string };
+  if (!usuarioId || !nivel) { res.status(400).json({ error: "usuarioId e nivel são obrigatórios" }); return; }
+
+  const [existing] = await db
+    .select()
+    .from(obraFiscaisTable)
+    .where(and(eq(obraFiscaisTable.obraId, obraId), eq(obraFiscaisTable.usuarioId, usuarioId)))
+    .limit(1);
+
+  if (existing) {
+    const [updated] = await db
+      .update(obraFiscaisTable)
+      .set({ nivel })
+      .where(eq(obraFiscaisTable.id, existing.id))
+      .returning();
+
+    const [usuario] = await db.select({ nome: usuariosTable.nome, email: usuariosTable.email, perfil: usuariosTable.perfil }).from(usuariosTable).where(eq(usuariosTable.id, usuarioId)).limit(1);
+    res.status(201).json({ ...updated, criadoEm: updated.criadoEm.toISOString(), usuarioNome: usuario?.nome ?? "", usuarioEmail: usuario?.email ?? "", usuarioPerfil: usuario?.perfil ?? "" });
+    return;
+  }
+
+  const [membro] = await db
+    .insert(obraFiscaisTable)
+    .values({ obraId, usuarioId, nivel, adicionadoPor: auth.userId })
+    .returning();
+
+  const [usuario] = await db.select({ nome: usuariosTable.nome, email: usuariosTable.email, perfil: usuariosTable.perfil }).from(usuariosTable).where(eq(usuariosTable.id, usuarioId)).limit(1);
+  const [authUser] = await db.select({ nome: usuariosTable.nome }).from(usuariosTable).where(eq(usuariosTable.id, auth.userId)).limit(1);
+
+  await logAudit({
+    auth,
+    usuarioNome: authUser?.nome ?? "Usuário",
+    acao: "equipe_adicionado",
+    descricao: `${usuario?.nome ?? "Fiscal"} adicionado como ${nivel} na obra`,
+    obraId,
+  });
+
+  res.status(201).json({ ...membro, criadoEm: membro.criadoEm.toISOString(), usuarioNome: usuario?.nome ?? "", usuarioEmail: usuario?.email ?? "", usuarioPerfil: usuario?.perfil ?? "" });
+});
+
+router.delete("/:id/equipe/:userId", async (req: AuthRequest, res: Response) => {
+  const { auth } = req;
+  if (auth.perfil !== "administrador" && auth.perfil !== "gestor") {
+    res.status(403).json({ error: "Apenas administradores e gestores podem gerenciar equipes" });
+    return;
+  }
+
+  const obraId = Number(req.params.id);
+  const userId = Number(req.params.userId);
+  if (isNaN(obraId) || isNaN(userId)) { res.status(400).json({ error: "ID inválido" }); return; }
+
+  await db.delete(obraFiscaisTable).where(and(eq(obraFiscaisTable.obraId, obraId), eq(obraFiscaisTable.usuarioId, userId)));
+
+  const [authUser] = await db.select({ nome: usuariosTable.nome }).from(usuariosTable).where(eq(usuariosTable.id, auth.userId)).limit(1);
+  const [removido] = await db.select({ nome: usuariosTable.nome }).from(usuariosTable).where(eq(usuariosTable.id, userId)).limit(1);
+
+  await logAudit({
+    auth,
+    usuarioNome: authUser?.nome ?? "Usuário",
+    acao: "equipe_removido",
+    descricao: `${removido?.nome ?? "Fiscal"} removido da equipe da obra`,
+    obraId,
+  });
+
+  res.status(204).end();
 });
 
 export default router;

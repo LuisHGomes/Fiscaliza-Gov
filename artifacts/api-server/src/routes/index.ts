@@ -10,6 +10,8 @@ import notificacoesRouter from "./notificacoes";
 import dashboardRouter from "./dashboard";
 import iaRouter from "./ia";
 import portalRouter from "./portal";
+import usuariosRouter from "./usuarios";
+import auditLogsRouter from "./audit_logs";
 
 const router: IRouter = Router();
 
@@ -24,5 +26,7 @@ router.use("/notificacoes", notificacoesRouter);
 router.use("/dashboard", dashboardRouter);
 router.use("/ia", iaRouter);
 router.use("/portal", portalRouter);
+router.use("/usuarios", usuariosRouter);
+router.use("/audit-logs", auditLogsRouter);
 
 export default router;

@@ -8,3 +8,5 @@ export * from "./aditivos";
 export * from "./documentos";
 export * from "./notificacoes";
 export * from "./analises_ia";
+export * from "./audit_logs";
+export * from "./obra_fiscais";

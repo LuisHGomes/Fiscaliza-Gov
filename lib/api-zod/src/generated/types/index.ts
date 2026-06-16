@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './addFiscalInput';
+export * from './addFiscalInputNivel';
 export * from './aditivo';
 export * from './aditivoInput';
 export * from './aditivoInputTipo';
@@ -13,6 +15,7 @@ export * from './aditivoTipo';
 export * from './analiseIA';
 export * from './analiseIANivelRisco';
 export * from './atividadeItem';
+export * from './auditLogItem';
 export * from './authResponse';
 export * from './chatInput';
 export * from './chatInputHistoricoItem';
@@ -24,6 +27,7 @@ export * from './documentoCategoria';
 export * from './documentoInput';
 export * from './documentoInputCategoria';
 export * from './healthStatus';
+export * from './listAuditLogsParams';
 export * from './listDocumentosParams';
 export * from './listMedicoesParams';
 export * from './listNaoConformidadesParams';
@@ -46,6 +50,8 @@ export * from './notificacaoInputTipo';
 export * from './notificacaoStatus';
 export * from './notificacaoTipo';
 export * from './obra';
+export * from './obraFiscalItem';
+export * from './obraFiscalItemNivel';
 export * from './obraInput';
 export * from './obraInputStatus';
 export * from './obraInputTipo';
@@ -63,6 +69,8 @@ export * from './timelineEvent';
 export * from './timelineEventMetadata';
 export * from './timelineEventTipo';
 export * from './totalizadores';
+export * from './updatePerfilInput';
+export * from './updateSenhaInput';
 export * from './user';
 export * from './userPerfil';
 export * from './visita';
