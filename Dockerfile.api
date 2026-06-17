@@ -1,0 +1,47 @@
+# Build stage
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+
+# Instalar pnpm
+RUN npm install -g pnpm
+
+# Copiar arquivos de configuração
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY tsconfig.base.json tsconfig.json ./
+
+# Copiar apenas os arquivos necessários
+COPY lib ./lib
+COPY artifacts/api-server ./artifacts/api-server
+
+# Instalar dependências
+RUN pnpm install --frozen-lockfile
+
+# Build
+WORKDIR /app/artifacts/api-server
+RUN pnpm run build
+
+# Runtime stage
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Instalar pnpm
+RUN npm install -g pnpm
+
+# Copiar apenas as dependências necessárias
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY lib ./lib
+COPY artifacts/api-server ./artifacts/api-server
+
+# Instalar apenas dependências de produção
+RUN pnpm install --prod --frozen-lockfile
+
+# Copiar build da API
+COPY --from=builder /app/artifacts/api-server/dist ./artifacts/api-server/dist
+
+WORKDIR /app/artifacts/api-server
+
+EXPOSE 8080
+
+CMD ["pnpm", "run", "start"]

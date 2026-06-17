@@ -1,0 +1,36 @@
+# Build stage
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+
+# Instalar pnpm
+RUN npm install -g pnpm
+
+# Copiar arquivos de configuração
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY tsconfig.base.json tsconfig.json ./
+
+# Copiar apenas os arquivos necessários
+COPY lib ./lib
+COPY artifacts/fiscaliza-gov ./artifacts/fiscaliza-gov
+
+# Instalar dependências
+RUN pnpm install --frozen-lockfile
+
+# Build
+WORKDIR /app/artifacts/fiscaliza-gov
+RUN pnpm run build
+
+# Runtime stage
+FROM node:24-alpine
+
+WORKDIR /app/artifacts/fiscaliza-gov
+
+# Instalar servidor HTTP simples para servir app estática
+RUN npm install -g serve
+
+COPY --from=builder /app/artifacts/fiscaliza-gov/dist ./dist
+
+EXPOSE 5173
+
+CMD ["serve", "-s", "dist", "-l", "5173"]
