@@ -6,8 +6,10 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
   const { data: kpis, isLoading: isLoadingKpis } = useGetDashboardKpis();
-  const { data: atividades, isLoading: isLoadingAtv } = useGetAtividadeRecente();
-  const { data: riscos, isLoading: isLoadingRisco } = useGetObrasEmRisco();
+  const { data: atividadesRaw, isLoading: isLoadingAtv } = useGetAtividadeRecente();
+  const { data: riscosRaw, isLoading: isLoadingRisco } = useGetObrasEmRisco();
+  const riscos = Array.isArray(riscosRaw) ? riscosRaw : [];
+  const atividades = Array.isArray(atividadesRaw) ? atividadesRaw : [];
 
   if (isLoadingKpis || isLoadingAtv || isLoadingRisco) {
     return <div className="p-8 text-center text-slate-500">Carregando painel de controle...</div>;
