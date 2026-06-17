@@ -1,12 +1,12 @@
-# 🏛️ FISCALIZA.GOV
+# FISCALIZA.GOV
 
 **Plataforma para gestão e fiscalização de obras públicas municipais**
 
 ---
 
-## 🚀 Como Rodar
+## Como Rodar
 
-### ⚡ Opção 1: Docker Compose (Recomendado - Mais Fácil)
+### Opção 1: Docker Compose (Recomendado - Mais Fácil)
 
 **Requisitos:** Docker e Docker Compose
 
@@ -15,15 +15,15 @@ docker-compose up
 ```
 
 Pronto! Isso vai:
-- ✅ Iniciar PostgreSQL automaticamente
-- ✅ Buildar e rodar a API (porta **8080**)
-- ✅ Buildar e rodar o frontend (porta **5173**)
+- Iniciar PostgreSQL automaticamente
+- Buildar e rodar a API (porta **8080**)
+- Buildar e rodar o frontend (porta **5173**)
 
 Então acesse: **http://localhost:5173**
 
 **Primeira vez:** Pode levar 2-3 minutos na primeira execução. Execuções futuras são instantâneas.
 
-### 🔧 Opção 2: Desenvolvimento Local (Manual)
+### Opção 2: Desenvolvimento Local (Manual)
 
 **Requisitos:**
 - Node.js 24+
@@ -59,7 +59,7 @@ pnpm run typecheck
 
 A aplicação estará disponível em **http://localhost:5173**
 
-### 🔑 Credenciais de Demonstração
+### Credenciais de Demonstração
 
 | Perfil     | E-mail                    | Senha    |
 | ---------- | ------------------------- | -------- |
@@ -70,7 +70,7 @@ A aplicação estará disponível em **http://localhost:5173**
 
 ---
 
-## 📚 Stack Tecnológico
+## Stack Tecnológico
 
 ### Backend
 - **Runtime:** Node.js 24, TypeScript 5.9
@@ -90,7 +90,7 @@ A aplicação estará disponível em **http://localhost:5173**
 
 ---
 
-## 📂 Estrutura do Repositório
+## Estrutura do Repositório
 
 ```
 .
@@ -115,7 +115,7 @@ A aplicação estará disponível em **http://localhost:5173**
 
 ---
 
-## 🎯 Módulos do Sistema
+## Módulos do Sistema
 
 - **Painel** — Indicadores de obras, atrasos, não conformidades e riscos
 - **Obras** — Cadastro, avanço físico, timeline, curva S, aditivos
@@ -129,7 +129,7 @@ A aplicação estará disponível em **http://localhost:5173**
 
 ---
 
-## 💻 Comandos Úteis
+## Comandos Úteis
 
 ### Desenvolvimento
 
@@ -201,7 +201,7 @@ pnpm --filter @workspace/api-spec run validate
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Docker: "Porta 5432 já em uso"
 ```bash
@@ -238,7 +238,7 @@ Já foi corrigido! Execute `pnpm install` novamente para pegar a versão atualiz
 
 ---
 
-## 📝 Observações de Desenvolvimento
+## Observações de Desenvolvimento
 
 - **Após alterar schema em `lib/db/`:** Execute `pnpm --filter @workspace/db run push` e reinicie a API
 - **Após alterar OpenAPI em `lib/api-spec/`:** Execute `pnpm --filter @workspace/api-spec run codegen` antes de usar novos hooks
@@ -248,7 +248,7 @@ Já foi corrigido! Execute `pnpm install` novamente para pegar a versão atualiz
 
 ---
 
-## 🔗 Endpoints Úteis
+## Endpoints Úteis
 
 - API health: `http://localhost:8080/health`
 - Frontend: `http://localhost:5173`
@@ -256,6 +256,6 @@ Já foi corrigido! Execute `pnpm install` novamente para pegar a versão atualiz
 
 ---
 
-## 📞 Suporte
+## Suporte
 
 Para dúvidas sobre desenvolvimento ou deploy, consulte a documentação de cada workspace individual nos respectivos `README.md`.
