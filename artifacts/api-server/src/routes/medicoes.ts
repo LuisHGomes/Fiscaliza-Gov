@@ -54,8 +54,8 @@ router.post("/", async (req: AuthRequest, res: Response) => {
     .insert(medicoesTable)
     .values({
       obraId: parse.data.obraId,
-      periodoInicio: parse.data.periodoInicio,
-      periodoFim: parse.data.periodoFim,
+      periodoInicio: parse.data.periodoInicio.toISOString(),
+      periodoFim: parse.data.periodoFim.toISOString(),
       valorTotal: String(parse.data.valorTotal),
       observacoes: parse.data.observacoes ?? null,
     })

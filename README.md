@@ -34,7 +34,7 @@
 
 ## Sobre o Projeto
 
-O **Fiscaliza.gov** é uma plataforma web para acompanhamento de obras públicas municipais, permitindo que gestores, fiscais e engenheiros monitorem cronogramas, registrem visitas e não conformidades, aprovem medições e mantenham um repositório centralizado de documentos — com um portal de transparência aberto à consulta pública.
+O **Fiscaliza.gov** é uma plataforma web para acompanhamento de obras públicas municipais, permitindo que gestores, fiscais e engenheiros monitorem cronogramas, registrem visitas e não conformidades, aprovem medições e mantenham um repositório centralizado de documentos, com um portal de transparência aberta à consulta pública.
 
 ---
 
@@ -86,6 +86,15 @@ EOF
 **3. Aplicar o schema do banco** (primeira vez)
 
 ```bash
+# 1. Configurar variável de ambiente
+echo "DATABASE_URL=postgresql://postgres:***@localhost:5432/fiscaliza_dev" > .env
+
+# 2. Gerar e aplicar migrações
+cd lib/db
+pnpm dlx drizzle-kit@0.31.10 generate --config drizzle.config.ts
+cd ..
+
+# 3. Aplicar migrações ao banco
 pnpm --filter @workspace/db run push
 ```
 
@@ -189,7 +198,6 @@ A aplicação estará disponível em **http://localhost:5173**
 | **Medições** | Boletins de medição com aprovação em múltiplas etapas |
 | **Documentos** | Repositório de documentos por categoria |
 | **Notificações** | Advertências, embargos e paralisações |
-| **Assistente IA** | Consultas contextuais sobre obras, prazos e métricas |
 | **Portal de Transparência** | Consulta pública de dados (sem autenticação) |
 
 ---
@@ -325,6 +333,69 @@ Já foi corrigido! Execute `pnpm install` novamente para pegar a versão atualiz
 
 ---
 
-## Suporte
+## Backup e Recuperação
 
-Para dúvidas sobre desenvolvimento ou deploy, consulte a documentação de cada workspace individual nos respectivos `README.md`.
+### Estratégia de Backup
+
+| Tipo | Frequência | Método | Armazenamento |
+|---|---|---|---|
+| **Backup completo** | Diário | `pg_dump` ou `pg_basebackup` | S3 / Drive corporativo |
+| **Backup de WAL** | A cada 5 min | `pg_basebackup` com `wal-g` | S3 / Drive corporativo |
+| **Backup de configuração** | Semanal | `git` + `docker-compose.yml` + `.env` | Repositório git + bloquinho físico |
+
+### Comandos de Backup
+
+```bash
+# Backup completo
+pg_dump -h localhost -U postgres -d fiscaliza_dev -F c -f backup_$(date +%Y%m%d_%H%M%S).dump
+
+# Restaurar
+pg_restore -h localhost -U postgres -d fiscaliza_dev backup_20261027_000000.dump
+```
+
+### Plano de Recuperação
+
+| Cenário | Tempo de Objetivo | Ação |
+|---|---|---|
+| **Perda de dados** | RTO: 4h | Restaurar do backup mais recente |
+| **Queda do servidor** | RTO: 1h | Recriar servidor, restaurar backup |
+| **Corrupção de dados** | RTO: 30min | Restaurar do WAL archive |
+| **Crime/comprometimento** | RTO: 1h | Reverter para snapshot anterior |
+
+### Verificação Regular
+
+- **Semanal**: Verificar integridade dos backups (`pg_verify_checksums`)
+- **Mensal**: Simular recuperação a partir de backup antigo
+- **Anual**: Validar plano completo com teste de emergência
+
+## Monitoramento e Alertas
+
+### Configuração
+
+| Ferramenta | Uso | Instalação |
+|---|---|---|
+| **Pino** | Logging estruturado | Já instalado no `api-server` |
+| **Pino Prettify** | Logging legível em dev | Já instalado |
+| **Sentry** | Monitoramento de erros | Adicionar `SENTRY_DSN` no `.env` |
+| **pg_stat_statements** | Métricas de performance | Ativar no PostgreSQL |
+
+### Alertas Configurados
+
+| Evento | Nível | Ação |
+|---|---|---|
+| Falha de login (5+ tentativas) | Alto | Disparar alerta + bloquear IP |
+| Token expirado | Médio | Notificar usuário |
+| Acesso não autorizado | Alto | Alertar segurança |
+| Timeout de conexão BD | Crítico | Verificar estado do BD |
+| Backup falhou | Crítico | Notificar equipe imediatamente |
+
+### Métricas de Performance
+
+- Latency média de requisições
+- Taxa de erro HTTP (5xx)
+- Uso de CPU/Memória do banco
+- Tempo de resposta das queries
+
+---
+
+## Suporte

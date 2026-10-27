@@ -550,64 +550,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Notificacao"
 
-  # IA
-  /ia/analise/{obraId}:
-    get:
-      operationId: getAnaliseIA
-      tags: [ia]
-      summary: Busca análise de risco mais recente da obra
-      parameters:
-        - name: obraId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Análise de risco
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AnaliseIA"
-
-  /ia/relatorio/{obraId}:
-    post:
-      operationId: gerarRelatorioIA
-      tags: [ia]
-      summary: Gera relatório executivo da obra via IA
-      parameters:
-        - name: obraId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Relatório gerado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RelatorioIA"
-
-  /ia/chat:
-    post:
-      operationId: chatAssistente
-      tags: [ia]
-      summary: Assistente do gestor via chat contextual
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ChatInput"
-      responses:
-        "200":
-          description: Resposta do assistente
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ChatResponse"
-
   # DASHBOARD
   /dashboard/kpis:
     get:

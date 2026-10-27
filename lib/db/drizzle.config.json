@@ -1,0 +1,11 @@
+{
+  "schema": "lib/db/src/schema",
+  "out": "lib/db/migrations",
+  "dialect": "postgresql",
+  "dbCredentials": {
+    "url": "postgresql://postgres:postgres@localhost:5432/fiscaliza_dev"
+  },
+  "tables": {
+    "exclude": []
+  }
+}

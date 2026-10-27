@@ -137,7 +137,7 @@ export default function Documentos() {
                       )}
                     </div>
                     <h3 className="font-medium text-slate-900 text-sm truncate" title={doc.nome}>{doc.nome}</h3>
-                    <p className="text-xs text-slate-500 mt-1">{new Date(doc.criadoEm).toLocaleDateString("pt-BR")}</p>
+                    <p className="text-xs text-slate-500 mt-1">{doc.criadoEm ? new Date(doc.criadoEm).toLocaleDateString("pt-BR") : ""}</p>
                     {doc.versao && <p className="text-xs text-slate-400">{doc.versao}</p>}
                   </div>
                   <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">

@@ -6,6 +6,9 @@ import { setAuthTokenGetter } from "@workspace/api-client-react";
 import NotFound from "@/pages/not-found";
 
 import Login from "./pages/login";
+import PrivacyPolicy from "./pages/privacy-policy";
+import TermsAndConditions from "./pages/terms-and-conditions";
+import RefundPolicy from "./pages/refund-policy";
 import Dashboard from "./pages/dashboard";
 import Portal from "./pages/portal";
 import Obras from "./pages/obras";
@@ -15,7 +18,6 @@ import NaoConformidades from "./pages/nao-conformidades";
 import Medicoes from "./pages/medicoes";
 import Documentos from "./pages/documentos";
 import Notificacoes from "./pages/notificacoes";
-import IAAssistente from "./pages/ia-assistente";
 import Perfil from "./pages/perfil";
 import MinhasObras from "./pages/minhas-obras";
 import { SidebarProvider } from "./components/ui/sidebar";
@@ -51,19 +53,21 @@ function Router() {
   return (
     <AppLayout>
       <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/obras" component={Obras} />
-        <Route path="/obras/:id" component={ObraDetalhe} />
-        <Route path="/visitas" component={Visitas} />
-        <Route path="/nao-conformidades" component={NaoConformidades} />
-        <Route path="/medicoes" component={Medicoes} />
-        <Route path="/documentos" component={Documentos} />
-        <Route path="/notificacoes" component={Notificacoes} />
-        <Route path="/ia-assistente" component={IAAssistente} />
-        <Route path="/perfil" component={Perfil} />
-        <Route path="/minhas-obras" component={MinhasObras} />
-        <Route component={NotFound} />
-      </Switch>
+              <Route path="/" component={Dashboard} />
+              <Route path="/obras" component={Obras} />
+              <Route path="/obras/:id" component={ObraDetalhe} />
+              <Route path="/visitas" component={Visitas} />
+              <Route path="/nao-conformidades" component={NaoConformidades} />
+              <Route path="/medicoes" component={Medicoes} />
+              <Route path="/documentos" component={Documentos} />
+              <Route path="/notificacoes" component={Notificacoes} />
+              <Route path="/perfil" component={Perfil} />
+              <Route path="/minhas-obras" component={MinhasObras} />
+              <Route path="/privacidade" component={PrivacyPolicy} />
+              <Route path="/termos" component={TermsAndConditions} />
+              <Route path="/politica-de-reembolso" component={RefundPolicy} />
+              <Route component={NotFound} />
+            </Switch>
     </AppLayout>
   );
 }

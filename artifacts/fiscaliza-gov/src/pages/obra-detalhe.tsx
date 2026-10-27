@@ -43,7 +43,7 @@ const TIMELINE_ICONS: Record<string, React.ElementType> = {
 const TIMELINE_COLORS: Record<string, string> = {
   visita: "bg-green-100 text-green-700",
   medicao: "bg-blue-100 text-blue-700",
-  aditivo: "bg-purple-100 text-purple-700",
+  aditivo: "bg-indigo-100 text-indigo-700",
   notificacao: "bg-amber-100 text-amber-700",
 };
 
@@ -80,7 +80,7 @@ export default function ObraDetalhe() {
   const handleAddFiscal = () => {
     if (!selectedFiscalId) return;
     addFiscal.mutate(
-      { id, addFiscalInput: { usuarioId: Number(selectedFiscalId), nivel: selectedNivel as any } },
+      { id, data: { usuarioId: Number(selectedFiscalId), nivel: selectedNivel as any } },
       {
         onSuccess: () => {
           toast({ title: "Fiscal adicionado à equipe" });
@@ -192,14 +192,14 @@ export default function ObraDetalhe() {
             <CardHeader><CardTitle className="text-base">Informações do Contrato</CardTitle></CardHeader>
             <CardContent className="space-y-3 text-sm">
               {[
-                { label: "Nº Contrato", value: obra.numeroContrato ?? "—" },
+                { label: "Nº Contrato", value: obra.numeroContrato ?? "" },
                 { label: "Valor Contratado", value: valorContratado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) },
                 { label: "Valor Atual", value: valorAtual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) },
-                { label: "CNPJ Empresa", value: obra.cnpjEmpresa ?? "—" },
-                { label: "Fonte de Recursos", value: obra.fonteRecursos ?? "—" },
+                { label: "CNPJ Empresa", value: obra.cnpjEmpresa ?? "" },
+                { label: "Fonte de Recursos", value: obra.fonteRecursos ?? "" },
                 { label: "Data de Início", value: obra.dataInicio },
                 { label: "Prazo Previsto", value: obra.dataFimPrevista },
-                { label: "Responsável Técnico", value: obra.responsavelTecnico ?? "—" },
+                { label: "Responsável Técnico", value: obra.responsavelTecnico ?? "" },
               ].map((row) => (
                 <div key={row.label} className="flex justify-between border-b border-slate-50 pb-2">
                   <span className="text-slate-500">{row.label}</span>

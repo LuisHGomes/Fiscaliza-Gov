@@ -15,6 +15,8 @@ export const usuariosTable = pgTable("usuarios", {
   perfil: varchar("perfil", { length: 20 }).default("fiscal").notNull(),
   avatar: text("avatar"),
   ativo: text("ativo").default("true"),
+  totpSecret: text("totp_secret"),
+  mfaAtivo: text("mfa_ativo").default("false"),
   criadoEm: timestamp("criado_em").defaultNow().notNull(),
 });
 

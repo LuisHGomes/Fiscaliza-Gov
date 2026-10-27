@@ -158,7 +158,7 @@ export default function Medicoes() {
                       <div className="grid grid-cols-3 gap-4 text-sm text-slate-600">
                         <span><span className="font-medium">Período:</span> {m.periodoInicio} a {m.periodoFim}</span>
                         <span><span className="font-medium">Valor:</span> {Number(m.valorTotal).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
-                        <span><span className="font-medium">Criado em:</span> {new Date(m.criadoEm).toLocaleDateString("pt-BR")}</span>
+                        <span><span className="font-medium">Criado em:</span> {m.criadoEm ? new Date(m.criadoEm).toLocaleDateString("pt-BR") : ""}</span>
                       </div>
                       {m.aprovadoEm && (
                         <p className="text-xs text-green-700 mt-1 flex items-center gap-1">

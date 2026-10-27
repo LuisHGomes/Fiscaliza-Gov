@@ -139,7 +139,7 @@ export default function MinhasObras() {
                           Prazo
                         </p>
                         <p className={`font-medium ${atrasada ? "text-destructive" : ""}`}>
-                          {dataFim ? dataFim.toLocaleDateString("pt-BR") : "—"}
+                          {dataFim ? dataFim.toLocaleDateString("pt-BR") : ""}
                           {atrasada && (
                             <AlertTriangle className="w-3 h-3 inline ml-1 text-destructive" />
                           )}
@@ -148,7 +148,7 @@ export default function MinhasObras() {
                     </div>
 
                     {obra.logradouro && (
-                      <p className="text-xs text-muted-foreground truncate">{obra.logradouro}{obra.bairro ? ` — ${obra.bairro}` : ""}</p>
+                      <p className="text-xs text-muted-foreground truncate">{obra.logradouro}{obra.bairro ? `, ${obra.bairro}` : ""}</p>
                     )}
                   </CardContent>
                 </Card>

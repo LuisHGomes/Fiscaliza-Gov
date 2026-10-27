@@ -47,7 +47,7 @@ router.post("/", async (req: AuthRequest, res: Response) => {
       categoria: parse.data.categoria,
       nome: parse.data.nome,
       fileUrl: parse.data.fileUrl,
-      expiracaoEm: parse.data.expiracaoEm ?? null,
+      expiracaoEm: parse.data.expiracaoEm?.toISOString() ?? null,
     })
     .returning();
 

@@ -2,6 +2,7 @@ export * from "./municipios";
 export * from "./usuarios";
 export * from "./obras";
 export * from "./visitas";
+export * from "./sessions";
 export * from "./nao_conformidades";
 export * from "./medicoes";
 export * from "./aditivos";

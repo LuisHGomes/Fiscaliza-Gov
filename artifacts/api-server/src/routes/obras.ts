@@ -6,6 +6,7 @@ import {
   obraFiscaisTable, usuariosTable
 } from "@workspace/db";
 import { eq, and, ilike, sql, desc, count, inArray } from "drizzle-orm";
+import { z } from "zod";
 import { requireAuth, AuthPayload } from "../middlewares/auth";
 import {
   CreateObraBody, UpdateObraBody, UpdateObraParams, GetObraParams,
@@ -99,7 +100,7 @@ router.post("/", async (req: AuthRequest, res: Response) => {
     res.status(400).json({ error: "Dados inválidos", details: parse.error.issues });
     return;
   }
-  const data = parse.data;
+  const data: z.infer<typeof CreateObraBody> = parse.data;
   const [obra] = await db
     .insert(obrasTable)
     .values({
@@ -110,8 +111,8 @@ router.post("/", async (req: AuthRequest, res: Response) => {
       status: data.status ?? "contratada",
       valorContratado: String(data.valorContratado),
       valorAtual: String(data.valorContratado),
-      dataInicio: data.dataInicio,
-      dataFimPrevista: data.dataFimPrevista,
+      dataInicio: data.dataInicio.toISOString(),
+      dataFimPrevista: data.dataFimPrevista.toISOString(),
       empresaContratada: data.empresaContratada,
       cnpjEmpresa: data.cnpjEmpresa ?? null,
       numeroContrato: data.numeroContrato ?? null,
@@ -139,7 +140,7 @@ router.post("/", async (req: AuthRequest, res: Response) => {
   });
 });
 
-// "Minhas Obras" — must be declared before /:id to avoid conflict
+// "Minhas Obras" must be declared before /:id to avoid conflict
 router.get("/minhas", async (req: AuthRequest, res: Response) => {
   const { auth } = req;
 
@@ -280,10 +281,10 @@ router.get("/:id/timeline", async (req: AuthRequest, res: Response) => {
   const notificacoes = await db.select({ id: notificacoesTable.id, enviadoEm: notificacoesTable.enviadoEm, tipo: notificacoesTable.tipo }).from(notificacoesTable).where(eq(notificacoesTable.obraId, obraId)).orderBy(desc(notificacoesTable.enviadoEm));
 
   const events = [
-    ...visitas.map((v) => ({ id: `visita-${v.id}`, tipo: "visita" as const, descricao: `Visita registrada — ${Number(v.percentualFisico)}% de avanço físico`, data: v.visitadoEm.toISOString(), autor: null, metadata: {} })),
-    ...medicoes.map((m) => ({ id: `medicao-${m.id}`, tipo: "medicao" as const, descricao: `Boletim de medição — R$ ${Number(m.valorTotal).toLocaleString("pt-BR")} (${m.status})`, data: m.criadoEm.toISOString(), autor: null, metadata: {} })),
+    ...visitas.map((v) => ({ id: `visita-${v.id}`, tipo: "visita" as const, descricao: `Visita registrada: ${Number(v.percentualFisico)}% de avanco fisico`, data: v.visitadoEm.toISOString(), autor: null, metadata: {} })),
+    ...medicoes.map((m) => ({ id: `medicao-${m.id}`, tipo: "medicao" as const, descricao: `Boletim de medição: R$ ${Number(m.valorTotal).toLocaleString("pt-BR")} (${m.status})`, data: m.criadoEm.toISOString(), autor: null, metadata: {} })),
     ...aditivos.map((a) => ({ id: `aditivo-${a.id}`, tipo: "aditivo" as const, descricao: `Aditivo nº ${a.numeroAditivo} (${a.tipo})`, data: a.criadoEm.toISOString(), autor: null, metadata: {} })),
-    ...notificacoes.map((n) => ({ id: `notificacao-${n.id}`, tipo: "notificacao" as const, descricao: `Notificação formal — ${n.tipo.replace(/_/g, " ")}`, data: n.enviadoEm.toISOString(), autor: null, metadata: {} })),
+    ...notificacoes.map((n) => ({ id: `notificacao-${n.id}`, tipo: "notificacao" as const, descricao: `Notificação formal: ${n.tipo.replace(/_/g, " ")}`, data: n.enviadoEm.toISOString(), autor: null, metadata: {} })),
   ].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
 
   res.json(events);
@@ -361,7 +362,7 @@ router.post("/:id/aditivos", async (req: AuthRequest, res: Response) => {
       tipo: parse.data.tipo,
       numeroAditivo: parse.data.numeroAditivo,
       justificativa: parse.data.justificativa,
-      dataAssinatura: parse.data.dataAssinatura,
+      dataAssinatura: parse.data.dataAssinatura.toISOString(),
       valorAcrescimo: parse.data.valorAcrescimo ? String(parse.data.valorAcrescimo) : null,
       diasAcrescimo: parse.data.diasAcrescimo ?? null,
       percentualAcrescimo,

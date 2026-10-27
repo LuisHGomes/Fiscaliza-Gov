@@ -129,7 +129,7 @@ router.get("/atividade-recente", async (req: AuthRequest, res: Response) => {
   const events = [
     ...visitas.map((v) => ({ id: `visita-${v.id}`, tipo: "visita", descricao: `Nova visita registrada com ${Number(v.percentualFisico)}% de avanço`, data: v.criadoEm.toISOString(), obraId: v.obraId, obraNome: obraMap[v.obraId] ?? null, autor: null })),
     ...ncs.map((nc) => ({ id: `nc-${nc.id}`, tipo: "nao_conformidade", descricao: `Não conformidade ${nc.severidade} registrada`, data: nc.criadoEm.toISOString(), obraId: nc.obraId, obraNome: obraMap[nc.obraId] ?? null, autor: null })),
-    ...medicoes.map((m) => ({ id: `medicao-${m.id}`, tipo: "medicao", descricao: `Boletim de medição — status: ${m.status.replace(/_/g, " ")}`, data: m.criadoEm.toISOString(), obraId: m.obraId, obraNome: obraMap[m.obraId] ?? null, autor: null })),
+    ...medicoes.map((m) => ({ id: `medicao-${m.id}`, tipo: "medicao" as const, descricao: `Boletim de medição: status: ${m.status.replace(/_/g, " ")}`, data: m.criadoEm.toISOString(), obraId: m.obraId, obraNome: obraMap[m.obraId] ?? null, autor: null })),
   ].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).slice(0, 10);
 
   res.json(events);

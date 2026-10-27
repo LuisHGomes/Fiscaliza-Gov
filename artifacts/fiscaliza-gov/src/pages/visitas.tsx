@@ -125,7 +125,7 @@ export default function Visitas() {
                       </span>
                     </div>
                     <div className="text-sm text-slate-500 mb-2">
-                      Fiscal: <span className="font-medium text-slate-700">{v.fiscalNome ?? "—"}</span>
+                      Fiscal: <span className="font-medium text-slate-700">{v.fiscalNome ?? ""}</span>
                       {" • "}
                       {new Date(v.visitadoEm).toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short", year: "numeric" })}
                     </div>
@@ -139,7 +139,7 @@ export default function Visitas() {
                       {v.gpsLat && (
                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />GPS registrado</span>
                       )}
-                      {v.totalFotos > 0 && (
+                      {v.totalFotos && v.totalFotos > 0 && (
                         <span className="flex items-center gap-1"><Camera className="w-3 h-3" />{v.totalFotos} foto(s)</span>
                       )}
                       {v.condicoesClimaticas && (
@@ -147,7 +147,7 @@ export default function Visitas() {
                       )}
                     </div>
                   </div>
-                  {v.totalNaoConformidades > 0 && (
+                  {v.totalNaoConformidades && v.totalNaoConformidades > 0 && (
                     <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-1 rounded">
                       {v.totalNaoConformidades} NC
                     </span>

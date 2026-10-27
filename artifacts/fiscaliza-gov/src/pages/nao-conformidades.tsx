@@ -222,7 +222,7 @@ export default function NaoConformidades() {
                       </p>
                     )}
                     <p className="text-xs text-slate-400 mt-2">
-                      Registrada em {new Date(nc.criadoEm).toLocaleDateString("pt-BR")}
+                      Registrada em {nc.criadoEm ? new Date(nc.criadoEm).toLocaleDateString("pt-BR") : ""}
                     </p>
                   </div>
                   {nc.status !== "resolvida" && (

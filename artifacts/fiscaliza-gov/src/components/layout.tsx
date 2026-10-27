@@ -30,7 +30,7 @@ const PERFIL_BADGE_COLORS: Record<string, string> = {
   gestor: "bg-blue-100 text-blue-700",
   fiscal: "bg-green-100 text-green-700",
   engenheiro: "bg-yellow-100 text-yellow-700",
-  auditor: "bg-purple-100 text-purple-700",
+  auditor: "bg-indigo-100 text-indigo-700",
 };
 
 function getInitials(name: string) {
@@ -136,8 +136,7 @@ function AppSidebar({ user, onLogout }: { user: any, onLogout: () => void }) {
     { name: "Não Conformidades", icon: AlertTriangle, path: "/nao-conformidades" },
     { name: "Documentos", icon: FileText, path: "/documentos" },
     { name: "Notificações", icon: Bell, path: "/notificacoes" },
-    { name: "IA Assistente", icon: MessageSquare, path: "/ia-assistente" },
-  ];
+    ];
 
   return (
     <Sidebar className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border">

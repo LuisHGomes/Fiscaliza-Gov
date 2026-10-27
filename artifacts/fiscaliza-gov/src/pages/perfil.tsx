@@ -205,12 +205,12 @@ export default function Perfil() {
                 </div>
                 <div className="space-y-2">
                   <Label>Município</Label>
-                  <Input value={user.municipioNome ?? "—"} disabled className="bg-muted" />
+                  <Input value={user.municipioNome ?? ""} disabled className="bg-muted" />
                 </div>
                 <div className="space-y-2">
                   <Label>Data de Cadastro</Label>
                   <Input
-                    value={user.criadoEm ? new Date(user.criadoEm).toLocaleDateString("pt-BR") : "—"}
+                    value={user.criadoEm ? new Date(user.criadoEm).toLocaleDateString("pt-BR") : ""}
                     disabled
                     className="bg-muted"
                   />

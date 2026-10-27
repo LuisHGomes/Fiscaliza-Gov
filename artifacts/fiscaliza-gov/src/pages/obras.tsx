@@ -219,7 +219,7 @@ export default function Obras() {
                     <div className="flex items-center gap-3 flex-wrap mb-2">
                       <h3 className="font-semibold text-slate-900 truncate">{obra.nome}</h3>
                       <ObraStatusBadge status={obra.status} />
-                      {obra.totalNaoConformidades > 0 && (
+                      {obra.totalNaoConformidades && obra.totalNaoConformidades > 0 && (
                         <span className="flex items-center gap-1 text-xs text-amber-600 font-medium">
                           <AlertTriangle className="w-3 h-3" />
                           {obra.totalNaoConformidades} NC
