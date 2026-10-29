@@ -399,3 +399,84 @@ pg_restore -h localhost -U postgres -d fiscaliza_dev backup_20261027_000000.dump
 ---
 
 ## Suporte
+
+Para dúvidas sobre desenvolvimento ou deploy, consulte a documentação de cada workspace individual nos respectivos `README.md`.
+
+---
+
+## Licença
+
+> **⚠️ Em elaboração para publicação.** Este projeto não possui licença oficial ainda.
+
+A licença a ser aplicada será definida conforme o processo de publicação. Propostas: **MIT License** (mais adequada para projetos open-source com uso educacional e demonstração).
+
+---
+
+## Roadmap
+
+Próximos passos para a publicação e evolução do projeto:
+
+- [ ] Publicar repositório como público (`LuisHGomes/Fiscaliza-Gov`)
+- [ ] Adicionar licença oficial (MIT sugerida)
+- [ ] Implementar autenticação MFA (TOTP)
+- [ ] Estruturar contrato OpenAPI completo e versionado
+- [ ] Adicionar testes automatizados (unitários e de integração)
+- [ ] Implementar relatórios gerenciais detalhados
+- [ ] Melhorar a performance da API (paginação, cache)
+- [ ] Publicar demo em ambiente de nuvem
+- [ ] Documentar API com Swagger/OpenAPI
+
+---
+
+## Contribuindo
+
+Este projeto está em andamento. Contribuições são bem-vindas!
+
+### Como Contribuir
+
+1. **Fork** o repositório
+2. **Clone** sua cópia local
+3. Crie uma branch para sua feature: `git checkout -b feature/MinhaFeature`
+4. **Commit** suas mudanças
+5. **Push** para a branch
+6. **Abra um Pull Request**
+
+### Boas Práticas
+
+- Siga o padrão de código do projeto
+- Atualize a documentação quando necessário
+- Adicione testes para novas funcionalidades
+- Mantenha mensagens de commit claras e concisas
+
+---
+
+## Deploy e Demonstração
+
+Este projeto está disponível para demonstração tanto local quanto em plataforma hospedada.
+
+### Rodando Localmente
+
+```bash
+# Clone o repositório
+git clone https://github.com/LuisHGomes/Fiscaliza-Gov.git
+cd Fiscaliza-Gov
+
+# Instale as dependências
+pnpm install
+
+# Configure o banco de dados (PostgreSQL)
+pnpm --filter @workspace/db run push
+
+# Inicie API e frontend
+pnpm --filter @workspace/api-server run dev
+pnpm --filter @workspace/fiscaliza-gov run dev
+```
+
+### Verificação
+
+- **API health**: `http://localhost:8080/healthz`
+- **Frontend**: `http://localhost:5173`
+
+---
+
+*Projeto desenvolvido por [Luís Henrique do Amaral Gomes](https://github.com/LuisHGomes).*
